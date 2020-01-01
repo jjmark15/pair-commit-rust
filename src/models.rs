@@ -88,9 +88,10 @@ pub mod author {
 
         #[test]
         fn test_author_deactivate() {
-            let mut author = Author::default();
-            author.activate();
-            assert_eq!(true, author.active());
+            let mut author = Author {
+                active: true,
+                ..Author::default()
+            };
             author.deactivate();
             assert_eq!(false, author.active());
         }
