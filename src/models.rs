@@ -27,6 +27,10 @@ pub mod author {
                 ..Author::default()
             };
         }
+
+        pub fn activate(&mut self) {
+            self.active = true
+        }
     }
 
     #[cfg(test)]
@@ -42,6 +46,13 @@ pub mod author {
         fn test_author_active_false_default() {
             let author = Author::default();
             assert_eq!(false, author.is_active())
+        }
+
+        #[test]
+        fn test_author_activate() {
+            let mut author = Author::default();
+            author.activate();
+            assert_eq!(true, author.is_active())
         }
     }
 }
