@@ -20,7 +20,7 @@ pub mod author {
             return self.active;
         }
 
-        pub fn new<'a>(name: String, email: String) -> Author {
+        pub fn new(name: String, email: String) -> Author {
             return Author {
                 name,
                 email,
