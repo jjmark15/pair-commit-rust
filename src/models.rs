@@ -1,7 +1,7 @@
 pub mod author {
     pub struct Author {
-        pub name: String,
-        pub email: String,
+        name: String,
+        email: String,
         active: bool,
     }
 
@@ -16,8 +16,16 @@ pub mod author {
     }
 
     impl Author {
-        pub fn is_active(&self) -> bool {
+        pub fn active(&self) -> bool {
             return self.active;
+        }
+
+        pub fn name(&self) -> &String {
+            &self.name
+        }
+
+        pub fn email(&self) -> &String {
+            &self.email
         }
 
         pub fn new(name: String, email: String) -> Author {
@@ -32,7 +40,7 @@ pub mod author {
             self.active = true
         }
 
-        pub fn get_coauthor_string(&self) -> String {
+        pub fn coauthor_string(&self) -> String {
             return format!("Co-authored-by: {} <{}>", self.name, self.email);
         }
     }
@@ -50,14 +58,28 @@ pub mod author {
         #[test]
         fn test_author_active_false_default() {
             let author = Author::default();
-            assert_eq!(false, author.is_active())
+            assert_eq!(false, author.active())
+        }
+
+        #[test]
+        fn test_name() {
+            let name = "Tester".to_string();
+            let author = Author::new(name.clone(), "".to_string());
+            assert_eq!(&name, author.name());
+        }
+
+        #[test]
+        fn test_email() {
+            let email = "tester@test.com".to_string();
+            let author = Author::new(email.clone(), "".to_string());
+            assert_eq!(&email, author.name());
         }
 
         #[test]
         fn test_author_activate() {
             let mut author = Author::default();
             author.activate();
-            assert_eq!(true, author.is_active())
+            assert_eq!(true, author.active())
         }
 
         #[test]
@@ -65,7 +87,7 @@ pub mod author {
             let name = String::from("Tester");
             let email = String::from("tester@test.com");
             let author: Author = Author::new(name, email);
-            assert_eq!("Co-authored-by: Tester <tester@test.com>", author.get_coauthor_string());
+            assert_eq!("Co-authored-by: Tester <tester@test.com>", author.coauthor_string());
         }
     }
 }
