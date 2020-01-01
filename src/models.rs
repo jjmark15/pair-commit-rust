@@ -40,6 +40,10 @@ pub mod author {
             self.active = true
         }
 
+        pub fn deactivate(&mut self) {
+            self.active = false;
+        }
+
         pub fn coauthor_string(&self) -> String {
             return format!("Co-authored-by: {} <{}>", self.name, self.email);
         }
@@ -80,6 +84,15 @@ pub mod author {
             let mut author = Author::default();
             author.activate();
             assert_eq!(true, author.active())
+        }
+
+        #[test]
+        fn test_author_deactivate() {
+            let mut author = Author::default();
+            author.activate();
+            assert_eq!(true, author.active());
+            author.deactivate();
+            assert_eq!(false, author.active());
         }
 
         #[test]
