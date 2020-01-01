@@ -37,5 +37,11 @@ pub mod author {
         fn test_author_initialisation() {
             let _author: Author = Author::new("Tester", "tester@test.com");
         }
+
+        #[test]
+        fn test_author_active_false_default() {
+            let author = Author::default();
+            assert_eq!(false, author.is_active())
+        }
     }
 }
