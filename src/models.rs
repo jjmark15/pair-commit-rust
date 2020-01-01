@@ -1,26 +1,26 @@
 pub mod author {
-    pub struct Author<'a> {
-        pub name: &'a str,
-        pub email: &'a str,
+    pub struct Author {
+        pub name: String,
+        pub email: String,
         active: bool,
     }
 
-    impl Default for Author<'_> {
+    impl Default for Author {
         fn default() -> Self {
             Author {
-                name: "",
-                email: "",
+                name: String::from(""),
+                email: String::from(""),
                 active: false,
             }
         }
     }
 
-    impl Author<'_> {
+    impl Author {
         pub fn is_active(&self) -> bool {
             return self.active;
         }
 
-        pub fn new<'a>(name: &'a str, email: &'a str) -> Author<'a> {
+        pub fn new<'a>(name: String, email: String) -> Author {
             return Author {
                 name,
                 email,
@@ -31,6 +31,10 @@ pub mod author {
         pub fn activate(&mut self) {
             self.active = true
         }
+
+        pub fn get_coauthor_string(&self) -> String {
+            return format!("Co-authored-by: {} <{}>", self.name, self.email);
+        }
     }
 
     #[cfg(test)]
@@ -39,7 +43,8 @@ pub mod author {
 
         #[test]
         fn test_author_initialisation() {
-            let _author: Author = Author::new("Tester", "tester@test.com");
+            let _author: Author = Author::new(
+                String::from("Tester"), String::from("tester@test.com"));
         }
 
         #[test]
@@ -53,6 +58,14 @@ pub mod author {
             let mut author = Author::default();
             author.activate();
             assert_eq!(true, author.is_active())
+        }
+
+        #[test]
+        fn test_author_coauthor_message() {
+            let name = String::from("Tester");
+            let email = String::from("tester@test.com");
+            let author: Author = Author::new(name, email);
+            assert_eq!("Co-authored-by: Tester <tester@test.com>", author.get_coauthor_string());
         }
     }
 }
