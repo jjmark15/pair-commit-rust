@@ -1,6 +1,6 @@
 use clap::{App, Arg, SubCommand};
 
-use pair_commit_tool::models::author::{Author, AuthorVec};
+use pair_commit_tool::models::author::{Author, AuthorVec, join_all_coauthor_strings};
 
 use crate::config::Config;
 use crate::persistence::{load, save};
@@ -77,6 +77,12 @@ pub fn init() {
         );
         authors.push(author);
         save(config.save_file_path(), &authors);
+    }
+
+    if let Some(add_matches) = matches.subcommand_matches(CliSubCommands::Message.get_string()) {
+        let authors = load(config.save_file_path())
+            .expect("Failed to load existing data");
+        println!("{}", join_all_coauthor_strings(&authors));
     }
 }
 

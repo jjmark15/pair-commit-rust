@@ -55,7 +55,7 @@ pub mod author {
                 email,
                 active,
                 ..Author::default()
-            }
+            };
         }
 
         pub fn activate(&mut self) {
@@ -69,6 +69,13 @@ pub mod author {
         pub fn coauthor_string(&self) -> String {
             return format!("Co-authored-by: {} <{}>", self.name, self.email);
         }
+    }
+
+    pub fn join_all_coauthor_strings(authors: &AuthorVec) -> String {
+        authors.iter()
+            .map(|author| author.coauthor_string())
+            .collect::<Vec<String>>()
+            .join("\n")
     }
 
     #[cfg(test)]
@@ -177,6 +184,19 @@ pub mod author {
                 email: tester@test.com\n  \
                 active: false".to_string();
             assert_eq!(expected, s);
+        }
+
+        #[test]
+        fn test_join_all_coauthor_strings() {
+            let authors = AuthorVec::from(vec![
+                Author::new(
+                    "Tester".to_string(), "tester@test.com".to_string()),
+                Author::new(
+                    "Tester".to_string(), "tester@test.com".to_string())
+            ]);
+            assert_eq!("Co-authored-by: Tester <tester@test.com>\n\
+                        Co-authored-by: Tester <tester@test.com>",
+                       join_all_coauthor_strings(&authors));
         }
     }
 }
