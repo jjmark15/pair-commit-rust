@@ -39,18 +39,18 @@ pub fn init() {
         .get_matches();
 
     if let Some(_list_matches) = matches.subcommand_matches(CliSubCommands::List.get_string()) {
-        let authors = load(&config.save_file_path()).expect("failed");
+        let authors = load(config.save_file_path()).expect("failed");
         println!("{:?}", authors);
     }
 
     if let Some(_add_matches) = matches.subcommand_matches(CliSubCommands::Add.get_string()) {
-        let mut authors = load(&config.save_file_path())
+        let mut authors = load(config.save_file_path())
             .expect("Failed to load existing data");
         let author = Author::new(
             "Josh".to_string(),
             "j@j.com".to_string(),
         );
         authors.push(author);
-        save(&config.save_file_path(), &authors);
+        save(config.save_file_path(), &authors);
     }
 }

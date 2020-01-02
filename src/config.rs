@@ -1,8 +1,9 @@
 use std::env;
+use std::path::PathBuf;
 
 #[derive(Debug)]
 pub struct Config {
-    app_home: String,
+    app_home: PathBuf,
     save_file_name: &'static str,
 }
 
@@ -16,11 +17,11 @@ impl Default for Config {
 }
 
 impl Config {
-    fn get_new_app_home() -> String {
-        const DEFAULT: &str = "~/.pair_commit_tool";
+    fn get_new_app_home() -> PathBuf {
+        let default = PathBuf::from("~/.pair_commit_tool");
         match env::var("PAIR_COMMIT_HOME") {
-            Ok(s) => s,
-            Err(_e) => DEFAULT.to_string()
+            Ok(s) => PathBuf::from(s),
+            Err(_e) => default
         }
     }
 
@@ -30,18 +31,24 @@ impl Config {
         }
     }
 
-    pub fn save_file_path(&self) -> String {
-        format!("{}/{}", &self.app_home, &self.save_file_name)
+    pub fn save_file_path(&self) -> PathBuf {
+        let mut path = PathBuf::new();
+        path.push(&self.app_home);
+        path.push(&self.save_file_name);
+        return path;
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::path::PathBuf;
+
     use crate::config::Config;
 
     #[test]
     fn test_save_file_path() {
         let config = Config::new();
-        assert_eq!("~/.pair_commit_tool/data.yml", config.save_file_path())
+        println!("{:?}", config.save_file_path());
+        assert_eq!(PathBuf::from("~/.pair_commit_tool/data.yml"), config.save_file_path())
     }
 }
