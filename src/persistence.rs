@@ -21,10 +21,21 @@ pub fn save(file_path: &String, authors: AuthorVec) {
     }
 }
 
+pub fn load(file_path: &String) -> Result<AuthorVec, serde_yaml::Error> {
+    let file = File::open(file_path);
+
+    match file {
+        Ok(f) => {
+            serde_yaml::from_reader::<File, AuthorVec>(f)
+        }
+        Err(_) => Ok(AuthorVec::new())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::models::author::{Author, AuthorVec};
-    use crate::persistence::save;
+    use crate::persistence::{load, save};
 
     #[test]
     fn test_write_successful() {
@@ -43,5 +54,21 @@ mod tests {
         let author = Author::default();
         authors.push(author);
         save(&path, authors);
+    }
+
+    #[test]
+    fn test_load_not_existing() {
+        let path = "test_data/persistence/nonexistent.yml".to_string();
+        let data = load(&path);
+        assert_eq!(true, data.is_ok());
+    }
+
+    #[test]
+    fn test_load_existing() {
+        let path = "test_data/persistence/basic.yml".to_string();
+        let data = load(&path);
+        assert_eq!(true, data.is_ok());
+        let authors = data.unwrap();
+        assert_eq!(false, authors.is_empty())
     }
 }
