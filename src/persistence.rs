@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::{ErrorKind, Write};
 
-use crate::models::author::AuthorVec;
+use pair_commit_tool::models::author::AuthorVec;
 
 pub fn save(file_path: &String, authors: AuthorVec) {
     let mut file = match File::create(file_path) {
@@ -34,7 +34,8 @@ pub fn load(file_path: &String) -> Result<AuthorVec, serde_yaml::Error> {
 
 #[cfg(test)]
 mod tests {
-    use crate::models::author::{Author, AuthorVec};
+    use pair_commit_tool::models::author::{Author, AuthorVec};
+
     use crate::persistence::{load, save};
 
     enum PersistenceFilePath {
