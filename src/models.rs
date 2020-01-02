@@ -133,5 +133,23 @@ pub mod author {
             authors.push(author);
             assert_eq!(false, authors.is_empty());
         }
+
+        #[test]
+        fn test_serialize_authors() {
+            let mut authors = AuthorVec::new();
+            let author = Author::new(
+                "Tester".to_string(),
+                "tester@test.com".to_string());
+            authors.push(author);
+
+            let r = serde_yaml::to_string(&authors);
+            assert_eq!(true, r.is_ok());
+            let s = r.unwrap();
+            let expected: String = "---\n\
+                - name: Tester\n  \
+                email: tester@test.com\n  \
+                active: false".to_string();
+            assert_eq!(expected, s);
+        }
     }
 }
