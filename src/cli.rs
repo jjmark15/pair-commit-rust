@@ -65,9 +65,7 @@ pub fn init() {
         let authors = load(config.save_file_path()).expect("failed");
         let output: String = get_list_command_string(&authors).unwrap_or("".to_string());
         println!("{}", output);
-    }
-
-    if let Some(add_matches) = matches.subcommand_matches(CliSubCommands::Add.get_string()) {
+    } else if let Some(add_matches) = matches.subcommand_matches(CliSubCommands::Add.get_string()) {
         let mut authors = load(config.save_file_path())
             .expect("Failed to load existing data");
         let author = Author::with_active_state(
@@ -77,9 +75,11 @@ pub fn init() {
         );
         authors.push(author);
         save(config.save_file_path(), &authors);
-    }
-
-    if let Some(_message_matches) = matches.subcommand_matches(CliSubCommands::Message.get_string()) {
+    } else if let Some(_message_matches) = matches.subcommand_matches(CliSubCommands::Message.get_string()) {
+        let authors = load(config.save_file_path())
+            .expect("Failed to load existing data");
+        println!("{}", join_all_coauthor_strings(&authors));
+    } else if let Some(configure_matches) = matches.subcommand_matches(CliSubCommands::Configure.get_string()) {
         let authors = load(config.save_file_path())
             .expect("Failed to load existing data");
         println!("{}", join_all_coauthor_strings(&authors));
