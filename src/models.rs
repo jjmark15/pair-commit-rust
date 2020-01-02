@@ -1,8 +1,20 @@
 pub mod author {
+    use std::collections::HashMap;
+    use std::fmt::{Display, Error, Formatter};
+
+    pub type AuthorMap = HashMap<i32, Author>;
+
+    #[derive(Debug)]
     pub struct Author {
         name: String,
         email: String,
         active: bool,
+    }
+
+    impl Display for Author {
+        fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+            write!(f, "{} <{}>", self.name, self.email)
+        }
     }
 
     impl Default for Author {
