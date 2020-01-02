@@ -18,10 +18,9 @@ impl Default for Config {
 
 impl Config {
     fn get_new_app_home() -> PathBuf {
-        let default = PathBuf::from("~/.pair_commit_tool");
         match env::var("PAIR_COMMIT_HOME") {
             Ok(s) => PathBuf::from(s),
-            Err(_e) => default
+            Err(_e) => get_default_app_home()
         }
     }
 
@@ -39,6 +38,14 @@ impl Config {
     }
 }
 
+fn get_default_app_home() -> PathBuf {
+    const APP_DIR_NAME: &'static str = ".pair_commit_tool";
+    let user_home = dirs::home_dir().expect("Could not determine user home directory");
+    let mut default = PathBuf::from(user_home);
+    default.push(APP_DIR_NAME);
+    default
+}
+
 #[cfg(test)]
 mod tests {
     use std::path::PathBuf;
@@ -48,7 +55,6 @@ mod tests {
     #[test]
     fn test_save_file_path() {
         let config = Config::new();
-        println!("{:?}", config.save_file_path());
         assert_eq!(PathBuf::from("~/.pair_commit_tool/data.yml"), config.save_file_path())
     }
 }
