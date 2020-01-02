@@ -48,8 +48,6 @@ fn get_default_app_home() -> PathBuf {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
-
     use regex::Regex;
 
     use crate::config::Config;

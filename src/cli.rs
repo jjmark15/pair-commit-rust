@@ -1,6 +1,6 @@
 use clap::{App, SubCommand};
 
-use pair_commit_tool::models::author::Author;
+use pair_commit_tool::models::author::{Author, AuthorVec};
 
 use crate::config::Config;
 use crate::persistence::{load, save};
@@ -40,7 +40,8 @@ pub fn init() {
 
     if let Some(_list_matches) = matches.subcommand_matches(CliSubCommands::List.get_string()) {
         let authors = load(config.save_file_path()).expect("failed");
-        println!("{:?}", authors);
+        let output: String = get_list_command_string(&authors).unwrap_or("".to_string());
+        println!("{}", output);
     }
 
     if let Some(_add_matches) = matches.subcommand_matches(CliSubCommands::Add.get_string()) {
@@ -53,4 +54,8 @@ pub fn init() {
         authors.push(author);
         save(config.save_file_path(), &authors);
     }
+}
+
+fn get_list_command_string(authors: &AuthorVec) -> Result<String, serde_yaml::Error> {
+    serde_yaml::to_string(authors)
 }
