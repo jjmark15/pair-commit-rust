@@ -6,6 +6,7 @@ use crate::cli::init;
 
 pub mod persistence;
 mod cli;
+mod config;
 
 fn main() {
     init();

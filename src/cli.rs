@@ -1,5 +1,10 @@
 use clap::{App, SubCommand};
 
+use pair_commit_tool::models::author::Author;
+
+use crate::config::Config;
+use crate::persistence::{load, save};
+
 enum CliSubCommands {
     List,
     Add,
@@ -19,6 +24,7 @@ impl CliSubCommands {
 }
 
 pub fn init() {
+    let config = Config::new();
     let matches = App::new(crate_name!())
         .version(crate_version!())
         .author(crate_authors!())
@@ -33,6 +39,18 @@ pub fn init() {
         .get_matches();
 
     if let Some(_list_matches) = matches.subcommand_matches(CliSubCommands::List.get_string()) {
-        println!("list");
+        let authors = load(&config.save_file_path()).expect("failed");
+        println!("{:?}", authors);
+    }
+
+    if let Some(_add_matches) = matches.subcommand_matches(CliSubCommands::Add.get_string()) {
+        let mut authors = load(&config.save_file_path())
+            .expect("Failed to load existing data");
+        let author = Author::new(
+            "Josh".to_string(),
+            "j@j.com".to_string(),
+        );
+        authors.push(author);
+        save(&config.save_file_path(), &authors);
     }
 }
