@@ -70,9 +70,10 @@ pub fn init() {
     if let Some(add_matches) = matches.subcommand_matches(CliSubCommands::Add.get_string()) {
         let mut authors = load(config.save_file_path())
             .expect("Failed to load existing data");
-        let author = Author::new(
+        let author = Author::with_active_state(
             add_matches.value_of("name").expect("Name value not found").to_string(),
             add_matches.value_of("email").expect("Email value not found").to_string(),
+            add_matches.is_present("active"),
         );
         authors.push(author);
         save(config.save_file_path(), &authors);

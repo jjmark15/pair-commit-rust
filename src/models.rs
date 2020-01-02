@@ -49,6 +49,15 @@ pub mod author {
             };
         }
 
+        pub fn with_active_state(name: String, email: String, active: bool) -> Author {
+            return Author {
+                name,
+                email,
+                active,
+                ..Author::default()
+            }
+        }
+
         pub fn activate(&mut self) {
             self.active = true
         }
@@ -70,6 +79,24 @@ pub mod author {
         fn test_author_initialisation() {
             let _author: Author = Author::new(
                 String::from("Tester"), String::from("tester@test.com"));
+        }
+
+        #[test]
+        fn test_with_active_state_true() {
+            let author = Author::with_active_state(
+                String::from("Tester"),
+                String::from("tester@test.com"),
+                true);
+            assert_eq!(true, author.active())
+        }
+
+        #[test]
+        fn test_with_active_state_false() {
+            let author = Author::with_active_state(
+                String::from("Tester"),
+                String::from("tester@test.com"),
+                false);
+            assert_eq!(false, author.active())
         }
 
         #[test]
