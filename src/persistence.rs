@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use pair_commit_tool::models::author::AuthorVec;
 
-pub fn save(file_path: PathBuf, authors: AuthorVec) {
+pub fn save(file_path: PathBuf, authors: &AuthorVec) {
     let mut file = match File::create(file_path) {
         Ok(file) => file,
         Err(error) => match error.kind() {
@@ -66,7 +66,7 @@ mod tests {
         let mut authors = AuthorVec::new();
         let author = Author::default();
         authors.push(author);
-        save(path, authors)
+        save(path, &authors)
     }
 
     #[test]
@@ -76,7 +76,7 @@ mod tests {
         let mut authors = AuthorVec::new();
         let author = Author::default();
         authors.push(author);
-        save(path, authors);
+        save(path, &authors);
     }
 
     #[test]
