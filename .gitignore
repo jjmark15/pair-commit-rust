@@ -2,5 +2,4 @@
 **/*.rs.bk
 /.idea
 /**/*.iml
-temp
-!temp/.gitkeep
+/test_data/**/writable.yml

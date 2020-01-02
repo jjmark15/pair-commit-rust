@@ -37,9 +37,27 @@ mod tests {
     use crate::models::author::{Author, AuthorVec};
     use crate::persistence::{load, save};
 
+    enum PersistenceFilePath {
+        Basic,
+        Missing,
+        Writable,
+        MissingParent,
+    }
+
+    impl PersistenceFilePath {
+        pub fn get_filepath(&self) -> &str {
+            match self {
+                PersistenceFilePath::Basic => "test_data/persistence/basic.yml",
+                PersistenceFilePath::Missing => "test_data/persistence/missing.yml",
+                PersistenceFilePath::Writable => "test_data/persistence/writable.yml",
+                PersistenceFilePath::MissingParent => "test_data/missing/missing.yml"
+            }
+        }
+    }
+
     #[test]
     fn test_write_successful() {
-        let valid_path = "temp/data.yml".to_string();
+        let valid_path = PersistenceFilePath::Writable.get_filepath().to_string();
         let mut authors = AuthorVec::new();
         let author = Author::default();
         authors.push(author);
@@ -49,7 +67,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_write_unsuccessful() {
-        let path = "temps/data.yml".to_string();
+        let path = PersistenceFilePath::MissingParent.get_filepath().to_string();
         let mut authors = AuthorVec::new();
         let author = Author::default();
         authors.push(author);
@@ -58,14 +76,14 @@ mod tests {
 
     #[test]
     fn test_load_not_existing() {
-        let path = "test_data/persistence/nonexistent.yml".to_string();
+        let path = PersistenceFilePath::Missing.get_filepath().to_string();
         let data = load(&path);
         assert_eq!(true, data.is_ok());
     }
 
     #[test]
     fn test_load_existing() {
-        let path = "test_data/persistence/basic.yml".to_string();
+        let path = PersistenceFilePath::Basic.get_filepath().to_string();
         let data = load(&path);
         assert_eq!(true, data.is_ok());
         let authors = data.unwrap();
