@@ -1,9 +1,11 @@
 pub mod author {
     use std::fmt::{Display, Error, Formatter};
 
+    use serde::{Deserialize, Serialize};
+
     pub type AuthorVec = Vec<Author>;
 
-    #[derive(Debug)]
+    #[derive(Debug, Serialize, Deserialize)]
     pub struct Author {
         name: String,
         email: String,
