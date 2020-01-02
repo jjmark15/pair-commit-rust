@@ -115,5 +115,14 @@ pub mod author {
             let author: Author = Author::new(name, email);
             assert_eq!("Co-authored-by: Tester <tester@test.com>", author.coauthor_string());
         }
+
+        #[test]
+        fn test_author_display() {
+            let author = Author::new(
+                "Tester".to_string(),
+                "tester@test.com".to_string());
+
+            assert_eq!("Tester <tester@test.com>", author.to_string());
+        }
     }
 }
