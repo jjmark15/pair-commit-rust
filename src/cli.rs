@@ -79,7 +79,7 @@ pub fn init() {
         save(config.save_file_path(), &authors);
     }
 
-    if let Some(add_matches) = matches.subcommand_matches(CliSubCommands::Message.get_string()) {
+    if let Some(_message_matches) = matches.subcommand_matches(CliSubCommands::Message.get_string()) {
         let authors = load(config.save_file_path())
             .expect("Failed to load existing data");
         println!("{}", join_all_coauthor_strings(&authors));
