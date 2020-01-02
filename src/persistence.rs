@@ -56,7 +56,7 @@ mod tests {
     }
 
     #[test]
-    fn test_write_successful() {
+    fn test_write_writable() {
         let valid_path = PersistenceFilePath::Writable.get_filepath().to_string();
         let mut authors = AuthorVec::new();
         let author = Author::default();
@@ -66,7 +66,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn test_write_unsuccessful() {
+    fn test_write_missing_parent() {
         let path = PersistenceFilePath::MissingParent.get_filepath().to_string();
         let mut authors = AuthorVec::new();
         let author = Author::default();
@@ -75,7 +75,7 @@ mod tests {
     }
 
     #[test]
-    fn test_load_not_existing() {
+    fn test_load_missing() {
         let path = PersistenceFilePath::Missing.get_filepath().to_string();
         let data = load(&path);
         assert_eq!(true, data.is_ok());
