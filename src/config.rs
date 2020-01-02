@@ -50,11 +50,14 @@ fn get_default_app_home() -> PathBuf {
 mod tests {
     use std::path::PathBuf;
 
+    use regex::Regex;
+
     use crate::config::Config;
 
     #[test]
     fn test_save_file_path() {
         let config = Config::new();
-        assert_eq!(PathBuf::from("~/.pair_commit_tool/data.yml"), config.save_file_path())
+        let re = Regex::new(r"/home/\w*/.pair_commit_tool").unwrap();
+        assert_eq!(true, re.is_match(config.save_file_path().to_str().unwrap()));
     }
 }
