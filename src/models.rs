@@ -1,8 +1,7 @@
 pub mod author {
-    use std::collections::HashMap;
     use std::fmt::{Display, Error, Formatter};
 
-    pub type AuthorMap = HashMap<i32, Author>;
+    pub type AuthorVec = Vec<Author>;
 
     #[derive(Debug)]
     pub struct Author {
@@ -123,6 +122,14 @@ pub mod author {
                 "tester@test.com".to_string());
 
             assert_eq!("Tester <tester@test.com>", author.to_string());
+        }
+
+        #[test]
+        fn test_create_author_vec() {
+            let mut authors = AuthorVec::new();
+            let author = Author::default();
+            authors.push(author);
+            assert_eq!(false, authors.is_empty());
         }
     }
 }
