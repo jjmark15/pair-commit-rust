@@ -1,4 +1,4 @@
-use clap::{App, SubCommand};
+use clap::{App, Arg, SubCommand};
 
 use pair_commit_tool::models::author::{Author, AuthorVec};
 
@@ -31,7 +31,30 @@ pub fn init() {
         .subcommand(SubCommand::with_name(CliSubCommands::List.get_string())
             .about("Lists all co-authors with their metadata"))
         .subcommand(SubCommand::with_name(CliSubCommands::Add.get_string())
-            .about("Add a new co-author"))
+            .about("Add a new co-author")
+            .arg(Arg::with_name("name")
+                .short("n")
+                .long("name")
+                .required(true)
+                .multiple(false)
+                .takes_value(true)
+                .value_name("NAME")
+                .help("Set new co-author name"))
+            .arg(Arg::with_name("email")
+                .short("e")
+                .long("email")
+                .required(true)
+                .multiple(false)
+                .takes_value(true)
+                .value_name("EMAIL")
+                .help("Set new co-author email"))
+            .arg(Arg::with_name("active")
+                .short("a")
+                .long("active")
+                .required(false)
+                .multiple(false)
+                .takes_value(false)
+                .help("Set new co-author as active")))
         .subcommand(SubCommand::with_name(CliSubCommands::Configure.get_string())
             .about("Configure which co-authors are active"))
         .subcommand(SubCommand::with_name(CliSubCommands::Message.get_string())
@@ -44,12 +67,12 @@ pub fn init() {
         println!("{}", output);
     }
 
-    if let Some(_add_matches) = matches.subcommand_matches(CliSubCommands::Add.get_string()) {
+    if let Some(add_matches) = matches.subcommand_matches(CliSubCommands::Add.get_string()) {
         let mut authors = load(config.save_file_path())
             .expect("Failed to load existing data");
         let author = Author::new(
-            "Josh".to_string(),
-            "j@j.com".to_string(),
+            add_matches.value_of("name").expect("Name value not found").to_string(),
+            add_matches.value_of("email").expect("Email value not found").to_string(),
         );
         authors.push(author);
         save(config.save_file_path(), &authors);
