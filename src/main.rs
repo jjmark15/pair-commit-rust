@@ -4,7 +4,7 @@ extern crate clap;
 
 use crate::cli::init;
 
-pub mod persistence;
+mod persistence;
 mod cli;
 mod config;
 
