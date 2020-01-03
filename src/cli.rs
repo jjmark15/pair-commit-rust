@@ -155,3 +155,15 @@ fn read_input_line() -> String {
         .expect("Cannot read from stdin");
     buf.trim().to_owned()
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::cli::split_string_to_vec;
+
+    #[test]
+    fn test_split_string_to_vec_i32() {
+        let string = "1 2 3 4".to_string();
+        let vec = split_string_to_vec::<i32>(string);
+        assert_eq!(vec![1, 2, 3, 4], vec);
+    }
+}
