@@ -5,7 +5,7 @@ use std::str::FromStr;
 use clap::{App, Arg, SubCommand};
 
 use pair_commit_tool::models::author::{
-    join_all_coauthor_strings, set_active_authors_in_place, Author, AuthorVec,
+    join_all_coauthor_strings, set_active_authors_in_place, Author,
 };
 
 use crate::config::Config;
@@ -119,7 +119,7 @@ pub fn init() {
     }
 }
 
-fn get_list_command_string(authors: &AuthorVec) -> Result<String, serde_yaml::Error> {
+fn get_list_command_string(authors: &[Author]) -> Result<String, serde_yaml::Error> {
     serde_yaml::to_string(authors)
 }
 
