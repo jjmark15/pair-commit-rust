@@ -1,6 +1,10 @@
+use std::io;
+use std::io::{BufRead, Write};
+use std::str::FromStr;
+
 use clap::{App, Arg, SubCommand};
 
-use pair_commit_tool::models::author::{Author, AuthorVec, join_all_coauthor_strings};
+use pair_commit_tool::models::author::{Author, AuthorVec, join_all_coauthor_strings, set_active_authors_in_place};
 
 use crate::config::Config;
 use crate::persistence::{load, save};
@@ -79,13 +83,48 @@ pub fn init() {
         let authors = load(config.save_file_path())
             .expect("Failed to load existing data");
         println!("{}", join_all_coauthor_strings(&authors));
-    } else if let Some(configure_matches) = matches.subcommand_matches(CliSubCommands::Configure.get_string()) {
-        let authors = load(config.save_file_path())
-            .expect("Failed to load existing data");
-        println!("{}", join_all_coauthor_strings(&authors));
+    } else if let Some(_configure_matches) = matches.subcommand_matches(CliSubCommands::Configure.get_string()) {
+        let mut authors = load(config.save_file_path()).expect("failed");
+        let output: String = get_list_command_string(&authors).unwrap_or("".to_string());
+        println!("{}", output);
+        let input = get_user_input::<i32>(
+            String::from("Enter the indexes of the authors to be active"));
+//        let indexes: Vec<i32> = input.iter()
+//            .filter_map(|r| r.ok().as_ref()).collect();
+//        let indexes: Vec<Result<i32, <i32 as trait>::Err>> = input.iter()
+//            .filter(|r| r.is_ok())
+//            .map(|r| r.clone().as_ref().unwrap())
+//            .collect();
+//        println!("{:?}", &input);
+//        set_active_authors_in_place(&indexes, &mut authors)
     }
 }
 
 fn get_list_command_string(authors: &AuthorVec) -> Result<String, serde_yaml::Error> {
     serde_yaml::to_string(authors)
+}
+
+fn get_user_input<T: FromStr>(prompt: String) -> Vec<Result<T, T::Err>> {
+    print!("{}: ", prompt);
+    match read_input_line() {
+        Some(s) => {
+            s.split(",").map(|s| s.to_string()
+                .trim()
+                .parse::<T>()
+            ).collect()
+        }
+        None => vec![]
+    }
+}
+
+fn read_input_line() -> Option<String> {
+    io::stdout().flush().unwrap();
+    let stdin = io::stdin();
+    let mut buf = String::new();
+    stdin.lock().read_line(&mut buf).expect("Cannot read from stdin");
+    if buf.trim().is_empty() {
+        None
+    } else {
+        Some(buf.trim().to_owned())
+    }
 }
