@@ -1,4 +1,5 @@
 pub mod author {
+    use std::convert::TryFrom;
     use std::fmt::{Display, Error, Formatter};
 
     use serde::{Deserialize, Serialize};
@@ -76,6 +77,16 @@ pub mod author {
             .map(|author| author.coauthor_string())
             .collect::<Vec<String>>()
             .join("\n")
+    }
+
+    pub fn set_active_authors_in_place(indexes: &Vec<i32>, authors: &mut Vec<Author>) {
+        for (index, author) in authors.iter_mut().enumerate() {
+            let i32_index: i32 = i32::try_from(index).expect("failed to convert usize to i32");
+            match indexes.contains(&i32_index) {
+                true => author.activate(),
+                false => author.deactivate()
+            }
+        }
     }
 
     #[cfg(test)]
@@ -197,6 +208,20 @@ pub mod author {
             assert_eq!("Co-authored-by: Tester <tester@test.com>\n\
                         Co-authored-by: Tester <tester@test.com>",
                        join_all_coauthor_strings(&authors));
+        }
+
+        #[test]
+        fn test_set_active_authors_in_place() {
+            let mut authors = AuthorVec::from(vec![
+                Author::new(
+                    "Tester".to_string(), "tester@test.com".to_string()),
+                Author::with_active_state(
+                    "Tester".to_string(), "tester@test.com".to_string(), true)
+            ]);
+
+            set_active_authors_in_place(&vec![0 as i32], &mut authors);
+            assert!(authors.get(0).unwrap().active);
+            assert!(!authors.get(1).unwrap().active);
         }
     }
 }
