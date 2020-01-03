@@ -83,7 +83,7 @@ pub fn init() {
 
     if let Some(_list_matches) = matches.subcommand_matches(CliSubCommands::List.get_string()) {
         let authors = load(config.save_file_path()).expect("failed");
-        let output: String = get_list_command_string(&authors).unwrap_or("".to_string());
+        let output: String = get_list_command_string(&authors).unwrap_or_else(|_| "".to_string());
         println!("{}", output);
     } else if let Some(add_matches) = matches.subcommand_matches(CliSubCommands::Add.get_string()) {
         let mut authors = load(config.save_file_path()).expect("Failed to load existing data");
@@ -109,7 +109,7 @@ pub fn init() {
         matches.subcommand_matches(CliSubCommands::Configure.get_string())
     {
         let mut authors = load(config.save_file_path()).expect("failed");
-        let output: String = get_list_command_string(&authors).unwrap_or("".to_string());
+        let output: String = get_list_command_string(&authors).unwrap_or_else(|_| "".to_string());
         println!("{}", output);
         let indexes = get_user_input::<i32>(String::from(
             "Enter the indexes of the authors to be active",
