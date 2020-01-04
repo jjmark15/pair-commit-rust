@@ -58,10 +58,11 @@ impl AuthorCollection {
             .enumerate()
             .map(|(index, author)| {
                 format!(
-                    "- index: {}\n  name: {}\n  email: {}",
+                    "- index: {}\n  name: {}\n  email: {}\n  active: {}",
                     index,
                     author.name(),
-                    author.email()
+                    author.email(),
+                    author.active()
                 )
             })
             .collect::<Vec<String>>()
@@ -152,11 +153,13 @@ mod tests {
         let s = authors.authors_with_indexes();
         let expected = "- index: 0\n  \
                         name: Tester\n  \
-                        email: tester@test.com\n\
+                        email: tester@test.com\n  \
+                        active: false\n\
                         ---\n\
                         - index: 1\n  \
                         name: Tester\n  \
-                        email: tester@test.com"
+                        email: tester@test.com\n  \
+                        active: true"
             .to_string();
         assert_eq!(expected, s);
     }
