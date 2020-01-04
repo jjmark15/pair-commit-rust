@@ -81,17 +81,6 @@ pub mod author {
             .join("\n")
     }
 
-    pub fn set_active_authors_in_place(indexes: &[i32], authors: &mut AuthorVec) {
-        for (index, author) in authors.iter_mut().enumerate() {
-            let i32_index: i32 = i32::try_from(index).expect("failed to convert usize to i32");
-            if indexes.contains(&i32_index) {
-                author.activate()
-            } else {
-                author.deactivate()
-            }
-        }
-    }
-
     pub struct AuthorCollection {
         authors: AuthorVec,
     }
@@ -121,6 +110,17 @@ pub mod author {
 
         pub fn active_authors(&self) -> Vec<&Author> {
             self.authors.iter().filter(|a| a.active()).collect()
+        }
+
+        pub fn set_active_authors_by_indexes(&mut self, indexes: &[i32]) {
+            for (index, author) in self.authors.iter_mut().enumerate() {
+                let i32_index: i32 = i32::try_from(index).expect("failed to convert usize to i32");
+                if indexes.contains(&i32_index) {
+                    author.activate()
+                } else {
+                    author.deactivate()
+                }
+            }
         }
     }
 
@@ -266,19 +266,19 @@ pub mod author {
         }
 
         #[test]
-        fn test_set_active_authors_in_place() {
-            let mut authors = vec![
+        fn test_set_active_authors_by_indexes() {
+            let mut authors = AuthorCollection::from(vec![
                 Author::new("Tester".to_string(), "tester@test.com".to_string()),
                 Author::with_active_state(
                     "Tester".to_string(),
                     "tester@test.com".to_string(),
                     true,
                 ),
-            ];
+            ]);
 
-            set_active_authors_in_place(&[0 as i32], &mut authors);
-            assert!(authors.get(0).unwrap().active);
-            assert!(!authors.get(1).unwrap().active);
+            authors.set_active_authors_by_indexes(&[0 as i32]);
+            assert!(authors.authors().get(0).unwrap().active);
+            assert!(!authors.authors().get(1).unwrap().active);
         }
 
         #[test]

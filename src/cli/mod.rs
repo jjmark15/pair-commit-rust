@@ -2,9 +2,7 @@ use std::path::PathBuf;
 
 use clap::{App, Arg, SubCommand};
 
-use pair_commit_tool::models::author::{
-    join_all_coauthor_strings, set_active_authors_in_place, Author, AuthorCollection,
-};
+use pair_commit_tool::models::author::{join_all_coauthor_strings, Author, AuthorCollection};
 
 use crate::cli::user_input::{get_list_command_string, get_user_input};
 use crate::config::Config;
@@ -132,6 +130,6 @@ fn handle_configure_sub_command(mut authors: AuthorCollection, file_path: PathBu
     let indexes = get_user_input::<i32>(String::from(
         "Enter the indexes of the authors to be active",
     ));
-    set_active_authors_in_place(&indexes, authors.authors_mut());
+    authors.set_active_authors_by_indexes(&indexes);
     save(file_path, &authors);
 }
