@@ -115,8 +115,8 @@ pub mod author {
             }
         }
 
-        pub fn join_all_coauthor_strings(&self) -> String {
-            self.authors()
+        pub fn join_all_active_coauthor_strings(&self) -> String {
+            self.active_authors()
                 .iter()
                 .map(|author| author.coauthor_string())
                 .collect::<Vec<String>>()
@@ -253,15 +253,23 @@ pub mod author {
         }
 
         #[test]
-        fn test_join_all_coauthor_strings() {
+        fn test_join_all_active_coauthor_strings() {
             let authors = AuthorCollection::from(vec![
-                Author::new("Tester".to_string(), "tester@test.com".to_string()),
-                Author::new("Tester".to_string(), "tester@test.com".to_string()),
+                Author::with_active_state(
+                    "Tester".to_string(),
+                    "tester@test.com".to_string(),
+                    true,
+                ),
+                Author::with_active_state(
+                    "Tester".to_string(),
+                    "tester@test.com".to_string(),
+                    true,
+                ),
             ]);
             assert_eq!(
                 "Co-authored-by: Tester <tester@test.com>\n\
                  Co-authored-by: Tester <tester@test.com>",
-                authors.join_all_coauthor_strings()
+                authors.join_all_active_coauthor_strings()
             );
         }
 

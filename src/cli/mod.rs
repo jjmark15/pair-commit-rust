@@ -121,7 +121,7 @@ fn handle_add_sub_command(mut authors: AuthorCollection, new_author: Author, fil
 }
 
 fn handle_message_sub_command(authors: AuthorCollection) {
-    println!("{}", authors.join_all_coauthor_strings());
+    println!("{}", authors.join_all_active_coauthor_strings());
 }
 
 fn handle_configure_sub_command(mut authors: AuthorCollection, file_path: PathBuf) {
