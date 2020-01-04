@@ -2,7 +2,8 @@ use std::path::PathBuf;
 
 use clap::{App, Arg, SubCommand};
 
-use pair_commit_tool::models::author::{Author, AuthorCollection};
+use pair_commit_tool::models::author::author_collection::AuthorCollection;
+use pair_commit_tool::models::author::Author;
 
 use crate::cli::user_input::{get_list_command_string, get_user_input};
 use crate::config::Config;

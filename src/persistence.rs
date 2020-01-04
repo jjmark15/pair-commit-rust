@@ -2,7 +2,8 @@ use std::fs::File;
 use std::io::{ErrorKind, Write};
 use std::path::PathBuf;
 
-use pair_commit_tool::models::author::{Author, AuthorCollection};
+use pair_commit_tool::models::author::author_collection::AuthorCollection;
+use pair_commit_tool::models::author::Author;
 
 pub fn save(file_path: PathBuf, authors: &AuthorCollection) {
     let mut file = match File::create(file_path) {
@@ -41,7 +42,8 @@ pub fn load(file_path: PathBuf) -> Result<AuthorCollection, serde_yaml::Error> {
 mod tests {
     use std::path::PathBuf;
 
-    use pair_commit_tool::models::author::{Author, AuthorCollection};
+    use pair_commit_tool::models::author::author_collection::AuthorCollection;
+    use pair_commit_tool::models::author::Author;
 
     use crate::persistence::{load, save};
 

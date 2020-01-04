@@ -2,7 +2,7 @@ use std::io;
 use std::io::{BufRead, Write};
 use std::str::FromStr;
 
-use pair_commit_tool::models::author::AuthorCollection;
+use pair_commit_tool::models::author::author_collection::AuthorCollection;
 
 pub fn get_list_command_string(author_col: &AuthorCollection) -> Result<String, serde_yaml::Error> {
     serde_yaml::to_string(author_col.authors())
