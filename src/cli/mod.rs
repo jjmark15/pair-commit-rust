@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use clap::{App, Arg, SubCommand};
 
-use pair_commit_tool::models::author::{join_all_coauthor_strings, Author, AuthorCollection};
+use pair_commit_tool::models::author::{Author, AuthorCollection};
 
 use crate::cli::user_input::{get_list_command_string, get_user_input};
 use crate::config::Config;
@@ -121,7 +121,7 @@ fn handle_add_sub_command(mut authors: AuthorCollection, new_author: Author, fil
 }
 
 fn handle_message_sub_command(authors: AuthorCollection) {
-    println!("{}", join_all_coauthor_strings(&authors.authors()));
+    println!("{}", authors.join_all_coauthor_strings());
 }
 
 fn handle_configure_sub_command(mut authors: AuthorCollection, file_path: PathBuf) {
