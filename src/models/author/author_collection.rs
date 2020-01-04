@@ -51,6 +51,22 @@ impl AuthorCollection {
             .collect::<Vec<String>>()
             .join("\n")
     }
+
+    pub fn authors_with_indexes(&self) -> String {
+        self.authors()
+            .iter()
+            .enumerate()
+            .map(|(index, author)| {
+                format!(
+                    "- index: {}\n  name: {}\n  email: {}",
+                    index,
+                    author.name(),
+                    author.email()
+                )
+            })
+            .collect::<Vec<String>>()
+            .join("\n---\n")
+    }
 }
 
 impl Default for AuthorCollection {
@@ -125,5 +141,23 @@ mod tests {
     fn test_from_vec() {
         let collection: AuthorCollection = AuthorCollection::from(vec![Author::default()]);
         assert_eq!(1, collection.authors().len());
+    }
+
+    #[test]
+    fn test_authors_with_indexes() {
+        let authors = AuthorCollection::from(vec![
+            Author::new("Tester".to_string(), "tester@test.com".to_string()),
+            Author::with_active_state("Tester".to_string(), "tester@test.com".to_string(), true),
+        ]);
+        let s = authors.authors_with_indexes();
+        let expected = "- index: 0\n  \
+                        name: Tester\n  \
+                        email: tester@test.com\n\
+                        ---\n\
+                        - index: 1\n  \
+                        name: Tester\n  \
+                        email: tester@test.com"
+            .to_string();
+        assert_eq!(expected, s);
     }
 }
