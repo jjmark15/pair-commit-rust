@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{ErrorKind, Write};
 use std::path::PathBuf;
 
-use pair_commit_tool::models::author::{AuthorCollection, AuthorVec};
+use pair_commit_tool::models::author::{Author, AuthorCollection};
 
 pub fn save(file_path: PathBuf, authors: &AuthorCollection) {
     let mut file = match File::create(file_path) {
@@ -27,7 +27,7 @@ pub fn load(file_path: PathBuf) -> Result<AuthorCollection, serde_yaml::Error> {
 
     match file {
         Ok(f) => {
-            let vec = serde_yaml::from_reader::<File, AuthorVec>(f);
+            let vec = serde_yaml::from_reader::<File, Vec<Author>>(f);
             match vec {
                 Ok(vec) => Ok(AuthorCollection::from(vec)),
                 Err(e) => Err(e),

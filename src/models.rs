@@ -4,10 +4,6 @@ pub mod author {
 
     use serde::{Deserialize, Serialize};
 
-    pub type AuthorVec = Vec<Author>;
-
-    pub type AuthorSlice = [Author];
-
     #[derive(Debug, Serialize, Deserialize)]
     pub struct Author {
         name: String,
@@ -74,7 +70,7 @@ pub mod author {
     }
 
     pub struct AuthorCollection {
-        authors: AuthorVec,
+        authors: Vec<Author>,
     }
 
     impl AuthorCollection {
@@ -92,11 +88,11 @@ pub mod author {
             self.authors_mut().push(author);
         }
 
-        pub fn authors(&self) -> &AuthorVec {
+        pub fn authors(&self) -> &Vec<Author> {
             &self.authors
         }
 
-        pub fn authors_mut(&mut self) -> &mut AuthorVec {
+        pub fn authors_mut(&mut self) -> &mut Vec<Author> {
             &mut self.authors
         }
 
@@ -229,7 +225,7 @@ pub mod author {
 
         #[test]
         fn test_create_author_vec() {
-            let mut authors = AuthorVec::new();
+            let mut authors = Vec::new();
             let author = Author::default();
             authors.push(author);
             assert_eq!(false, authors.is_empty());
@@ -237,7 +233,7 @@ pub mod author {
 
         #[test]
         fn test_serialize_authors() {
-            let mut authors = AuthorVec::new();
+            let mut authors = Vec::new();
             let author = Author::new("Tester".to_string(), "tester@test.com".to_string());
             authors.push(author);
 
