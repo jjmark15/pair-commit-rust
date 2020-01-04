@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use clap::{App, Arg, SubCommand};
 
 use pair_commit_tool::models::author::{
-    join_all_coauthor_strings, set_active_authors_in_place, Author, AuthorVec,
+    join_all_coauthor_strings, set_active_authors_in_place, Author, AuthorCollection,
 };
 
 use crate::cli::user_input::{get_list_command_string, get_user_input};
@@ -112,26 +112,26 @@ pub fn init() {
     }
 }
 
-fn handle_list_sub_command(authors: AuthorVec) {
-    let output: String = get_list_command_string(&authors).unwrap_or_else(|_| "".to_string());
+fn handle_list_sub_command(author_col: AuthorCollection) {
+    let output: String = get_list_command_string(&author_col).unwrap_or_else(|_| "".to_string());
     println!("{}", output);
 }
 
-fn handle_add_sub_command(mut authors: AuthorVec, new_author: Author, file_path: PathBuf) {
-    authors.push(new_author);
+fn handle_add_sub_command(mut authors: AuthorCollection, new_author: Author, file_path: PathBuf) {
+    authors.add_author(new_author);
     save(file_path, &authors);
 }
 
-fn handle_message_sub_command(authors: AuthorVec) {
-    println!("{}", join_all_coauthor_strings(&authors));
+fn handle_message_sub_command(authors: AuthorCollection) {
+    println!("{}", join_all_coauthor_strings(&authors.authors()));
 }
 
-fn handle_configure_sub_command(mut authors: AuthorVec, file_path: PathBuf) {
+fn handle_configure_sub_command(mut authors: AuthorCollection, file_path: PathBuf) {
     let output: String = get_list_command_string(&authors).unwrap_or_else(|_| "".to_string());
     println!("{}", output);
     let indexes = get_user_input::<i32>(String::from(
         "Enter the indexes of the authors to be active",
     ));
-    set_active_authors_in_place(&indexes, &mut authors);
+    set_active_authors_in_place(&indexes, authors.authors_mut());
     save(file_path, &authors);
 }

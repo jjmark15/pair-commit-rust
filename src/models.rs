@@ -103,6 +103,10 @@ pub mod author {
             }
         }
 
+        fn from_vec(vec: Vec<Author>) -> AuthorCollection {
+            AuthorCollection { authors: vec }
+        }
+
         pub fn add_author(&mut self, author: Author) {
             self.authors_mut().push(author);
         }
@@ -123,6 +127,18 @@ pub mod author {
     impl Default for AuthorCollection {
         fn default() -> Self {
             AuthorCollection { authors: vec![] }
+        }
+    }
+
+    impl From<Vec<Author>> for AuthorCollection {
+        fn from(vec: Vec<Author>) -> Self {
+            AuthorCollection::from_vec(vec)
+        }
+    }
+
+    impl Into<Vec<Author>> for AuthorCollection {
+        fn into(self) -> Vec<Author> {
+            self.authors
         }
     }
 
@@ -283,6 +299,12 @@ pub mod author {
             ));
             let active = authors.active_authors();
             assert_eq!(1, active.len());
+        }
+
+        #[test]
+        fn test_from_vec() {
+            let collection: AuthorCollection = AuthorCollection::from(vec![Author::default()]);
+            assert_eq!(1, collection.authors().len());
         }
     }
 }
