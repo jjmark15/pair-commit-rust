@@ -92,6 +92,40 @@ pub mod author {
         }
     }
 
+    pub struct AuthorCollection {
+        authors: AuthorVec,
+    }
+
+    impl AuthorCollection {
+        pub fn new() -> AuthorCollection {
+            AuthorCollection {
+                ..AuthorCollection::default()
+            }
+        }
+
+        pub fn add_author(&mut self, author: Author) {
+            self.authors_mut().push(author);
+        }
+
+        pub fn authors(&self) -> &AuthorVec {
+            &self.authors
+        }
+
+        pub fn authors_mut(&mut self) -> &mut AuthorVec {
+            &mut self.authors
+        }
+
+        pub fn active_authors(&self) -> Vec<&Author> {
+            self.authors.iter().filter(|a| a.active()).collect()
+        }
+    }
+
+    impl Default for AuthorCollection {
+        fn default() -> Self {
+            AuthorCollection { authors: vec![] }
+        }
+    }
+
     #[cfg(test)]
     mod tests {
         use super::*;
@@ -229,6 +263,26 @@ pub mod author {
             set_active_authors_in_place(&[0 as i32], &mut authors);
             assert!(authors.get(0).unwrap().active);
             assert!(!authors.get(1).unwrap().active);
+        }
+
+        #[test]
+        fn test_add_author() {
+            let mut authors = AuthorCollection::new();
+            authors.add_author(Author::default());
+            assert!(!authors.authors().is_empty());
+        }
+
+        #[test]
+        fn test_active_authors() {
+            let mut authors = AuthorCollection::new();
+            authors.add_author(Author::default());
+            authors.add_author(Author::with_active_state(
+                "Tester".to_string(),
+                "tester@test.com".to_string(),
+                true,
+            ));
+            let active = authors.active_authors();
+            assert_eq!(1, active.len());
         }
     }
 }
