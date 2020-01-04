@@ -2,9 +2,9 @@ use std::io;
 use std::io::{BufRead, Write};
 use std::str::FromStr;
 
-use pair_commit_tool::models::author::Author;
+use pair_commit_tool::models::author::AuthorSlice;
 
-pub fn get_list_command_string(authors: &[Author]) -> Result<String, serde_yaml::Error> {
+pub fn get_list_command_string(authors: &AuthorSlice) -> Result<String, serde_yaml::Error> {
     serde_yaml::to_string(authors)
 }
 

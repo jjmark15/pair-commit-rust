@@ -34,14 +34,14 @@ impl Config {
         let mut path = PathBuf::new();
         path.push(&self.app_home);
         path.push(&self.save_file_name);
-        return path;
+        path
     }
 }
 
 fn get_default_app_home() -> PathBuf {
-    const APP_DIR_NAME: &'static str = ".pair_commit_tool";
+    const APP_DIR_NAME: &str = ".pair_commit_tool";
     let user_home = dirs::home_dir().expect("Could not determine user home directory");
-    let mut default = PathBuf::from(user_home);
+    let mut default = user_home;
     default.push(APP_DIR_NAME);
     default
 }

@@ -6,6 +6,8 @@ pub mod author {
 
     pub type AuthorVec = Vec<Author>;
 
+    pub type AuthorSlice = [Author];
+
     #[derive(Debug, Serialize, Deserialize)]
     pub struct Author {
         name: String,
@@ -31,7 +33,7 @@ pub mod author {
 
     impl Author {
         pub fn active(&self) -> bool {
-            return self.active;
+            self.active
         }
 
         pub fn name(&self) -> &String {
@@ -43,20 +45,19 @@ pub mod author {
         }
 
         pub fn new(name: String, email: String) -> Author {
-            return Author {
+            Author {
                 name,
                 email,
                 ..Author::default()
-            };
+            }
         }
 
         pub fn with_active_state(name: String, email: String, active: bool) -> Author {
-            return Author {
+            Author {
                 name,
                 email,
                 active,
-                ..Author::default()
-            };
+            }
         }
 
         pub fn activate(&mut self) {
@@ -72,19 +73,21 @@ pub mod author {
         }
     }
 
-    pub fn join_all_coauthor_strings(authors: &AuthorVec) -> String {
-        authors.iter()
+    pub fn join_all_coauthor_strings(authors: &AuthorSlice) -> String {
+        authors
+            .iter()
             .map(|author| author.coauthor_string())
             .collect::<Vec<String>>()
             .join("\n")
     }
 
-    pub fn set_active_authors_in_place(indexes: &Vec<i32>, authors: &mut Vec<Author>) {
+    pub fn set_active_authors_in_place(indexes: &[i32], authors: &mut AuthorVec) {
         for (index, author) in authors.iter_mut().enumerate() {
             let i32_index: i32 = i32::try_from(index).expect("failed to convert usize to i32");
-            match indexes.contains(&i32_index) {
-                true => author.activate(),
-                false => author.deactivate()
+            if indexes.contains(&i32_index) {
+                author.activate()
+            } else {
+                author.deactivate()
             }
         }
     }
@@ -95,8 +98,8 @@ pub mod author {
 
         #[test]
         fn test_author_initialisation() {
-            let _author: Author = Author::new(
-                String::from("Tester"), String::from("tester@test.com"));
+            let _author: Author =
+                Author::new(String::from("Tester"), String::from("tester@test.com"));
         }
 
         #[test]
@@ -104,7 +107,8 @@ pub mod author {
             let author = Author::with_active_state(
                 String::from("Tester"),
                 String::from("tester@test.com"),
-                true);
+                true,
+            );
             assert_eq!(true, author.active())
         }
 
@@ -113,7 +117,8 @@ pub mod author {
             let author = Author::with_active_state(
                 String::from("Tester"),
                 String::from("tester@test.com"),
-                false);
+                false,
+            );
             assert_eq!(false, author.active())
         }
 
@@ -159,14 +164,15 @@ pub mod author {
             let name = String::from("Tester");
             let email = String::from("tester@test.com");
             let author: Author = Author::new(name, email);
-            assert_eq!("Co-authored-by: Tester <tester@test.com>", author.coauthor_string());
+            assert_eq!(
+                "Co-authored-by: Tester <tester@test.com>",
+                author.coauthor_string()
+            );
         }
 
         #[test]
         fn test_author_display() {
-            let author = Author::new(
-                "Tester".to_string(),
-                "tester@test.com".to_string());
+            let author = Author::new("Tester".to_string(), "tester@test.com".to_string());
 
             assert_eq!("Tester <tester@test.com>", author.to_string());
         }
@@ -182,44 +188,45 @@ pub mod author {
         #[test]
         fn test_serialize_authors() {
             let mut authors = AuthorVec::new();
-            let author = Author::new(
-                "Tester".to_string(),
-                "tester@test.com".to_string());
+            let author = Author::new("Tester".to_string(), "tester@test.com".to_string());
             authors.push(author);
 
             let r = serde_yaml::to_string(&authors);
             assert_eq!(true, r.is_ok());
             let s = r.unwrap();
             let expected: String = "---\n\
-                - name: Tester\n  \
-                email: tester@test.com\n  \
-                active: false".to_string();
+                                    - name: Tester\n  \
+                                    email: tester@test.com\n  \
+                                    active: false"
+                .to_string();
             assert_eq!(expected, s);
         }
 
         #[test]
         fn test_join_all_coauthor_strings() {
-            let authors = AuthorVec::from(vec![
-                Author::new(
-                    "Tester".to_string(), "tester@test.com".to_string()),
-                Author::new(
-                    "Tester".to_string(), "tester@test.com".to_string())
-            ]);
-            assert_eq!("Co-authored-by: Tester <tester@test.com>\n\
-                        Co-authored-by: Tester <tester@test.com>",
-                       join_all_coauthor_strings(&authors));
+            let authors = vec![
+                Author::new("Tester".to_string(), "tester@test.com".to_string()),
+                Author::new("Tester".to_string(), "tester@test.com".to_string()),
+            ];
+            assert_eq!(
+                "Co-authored-by: Tester <tester@test.com>\n\
+                 Co-authored-by: Tester <tester@test.com>",
+                join_all_coauthor_strings(&authors)
+            );
         }
 
         #[test]
         fn test_set_active_authors_in_place() {
-            let mut authors = AuthorVec::from(vec![
-                Author::new(
-                    "Tester".to_string(), "tester@test.com".to_string()),
+            let mut authors = vec![
+                Author::new("Tester".to_string(), "tester@test.com".to_string()),
                 Author::with_active_state(
-                    "Tester".to_string(), "tester@test.com".to_string(), true)
-            ]);
+                    "Tester".to_string(),
+                    "tester@test.com".to_string(),
+                    true,
+                ),
+            ];
 
-            set_active_authors_in_place(&vec![0 as i32], &mut authors);
+            set_active_authors_in_place(&[0 as i32], &mut authors);
             assert!(authors.get(0).unwrap().active);
             assert!(!authors.get(1).unwrap().active);
         }
