@@ -20,7 +20,7 @@ impl Config {
     fn get_new_app_home() -> PathBuf {
         match env::var("PAIR_COMMIT_HOME") {
             Ok(s) => PathBuf::from(s),
-            Err(_e) => get_default_app_home()
+            Err(_e) => get_default_app_home(),
         }
     }
 

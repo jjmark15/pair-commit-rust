@@ -1,7 +1,9 @@
+use std::path::PathBuf;
+
 use clap::{App, Arg, SubCommand};
 
 use pair_commit_tool::models::author::{
-    join_all_coauthor_strings, set_active_authors_in_place, Author,
+    join_all_coauthor_strings, set_active_authors_in_place, Author, AuthorVec,
 };
 
 use crate::cli::user_input::{get_list_command_string, get_user_input};
@@ -81,11 +83,10 @@ pub fn init() {
         .get_matches();
 
     if let Some(_list_matches) = matches.subcommand_matches(CliSubCommands::List.get_string()) {
-        let authors = load(config.save_file_path()).expect("failed");
-        let output: String = get_list_command_string(&authors).unwrap_or_else(|_| "".to_string());
-        println!("{}", output);
+        let authors = load(config.save_file_path()).expect("Failed to load existing data");
+        handle_list_sub_command(authors);
     } else if let Some(add_matches) = matches.subcommand_matches(CliSubCommands::Add.get_string()) {
-        let mut authors = load(config.save_file_path()).expect("Failed to load existing data");
+        let authors = load(config.save_file_path()).expect("Failed to load existing data");
         let author = Author::with_active_state(
             add_matches
                 .value_of("name")
@@ -97,23 +98,40 @@ pub fn init() {
                 .to_string(),
             add_matches.is_present("active"),
         );
-        authors.push(author);
-        save(config.save_file_path(), &authors);
+        handle_add_sub_command(authors, author, config.save_file_path());
     } else if let Some(_message_matches) =
         matches.subcommand_matches(CliSubCommands::Message.get_string())
     {
         let authors = load(config.save_file_path()).expect("Failed to load existing data");
-        println!("{}", join_all_coauthor_strings(&authors));
+        handle_message_sub_command(authors);
     } else if let Some(_configure_matches) =
         matches.subcommand_matches(CliSubCommands::Configure.get_string())
     {
-        let mut authors = load(config.save_file_path()).expect("failed");
-        let output: String = get_list_command_string(&authors).unwrap_or_else(|_| "".to_string());
-        println!("{}", output);
-        let indexes = get_user_input::<i32>(String::from(
-            "Enter the indexes of the authors to be active",
-        ));
-        set_active_authors_in_place(&indexes, &mut authors);
-        save(config.save_file_path(), &authors);
+        let authors = load(config.save_file_path()).expect("failed");
+        handle_configure_sub_command(authors, config.save_file_path());
     }
+}
+
+fn handle_list_sub_command(authors: AuthorVec) {
+    let output: String = get_list_command_string(&authors).unwrap_or_else(|_| "".to_string());
+    println!("{}", output);
+}
+
+fn handle_add_sub_command(mut authors: AuthorVec, new_author: Author, file_path: PathBuf) {
+    authors.push(new_author);
+    save(file_path, &authors);
+}
+
+fn handle_message_sub_command(authors: AuthorVec) {
+    println!("{}", join_all_coauthor_strings(&authors));
+}
+
+fn handle_configure_sub_command(mut authors: AuthorVec, file_path: PathBuf) {
+    let output: String = get_list_command_string(&authors).unwrap_or_else(|_| "".to_string());
+    println!("{}", output);
+    let indexes = get_user_input::<i32>(String::from(
+        "Enter the indexes of the authors to be active",
+    ));
+    set_active_authors_in_place(&indexes, &mut authors);
+    save(file_path, &authors);
 }
