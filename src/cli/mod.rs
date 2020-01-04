@@ -126,7 +126,7 @@ fn handle_message_sub_command(authors: AuthorCollection) {
 }
 
 fn handle_configure_sub_command(mut authors: AuthorCollection, file_path: PathBuf) {
-    let output: String = get_list_command_string(&authors).unwrap_or_else(|_| "".to_string());
+    let output: String = authors.authors_with_indexes();
     println!("{}", output);
     let indexes = get_user_input::<i32>(String::from(
         "Enter the indexes of the authors to be active",
