@@ -8,7 +8,7 @@ pub fn get_list_command_string(author_col: &AuthorCollection) -> Result<String, 
     serde_yaml::to_string(author_col.authors())
 }
 
-pub fn get_user_input<T: FromStr>(prompt: String) -> Vec<T>
+pub fn get_user_input<T: FromStr + Default>(prompt: String) -> Vec<T>
 where
     <T as std::str::FromStr>::Err: std::fmt::Debug,
 {
@@ -21,12 +21,12 @@ where
     }
 }
 
-fn split_string_to_vec<T: FromStr>(s: String) -> Vec<T>
+fn split_string_to_vec<T: FromStr + Default>(s: String) -> Vec<T>
 where
     <T as std::str::FromStr>::Err: std::fmt::Debug,
 {
     s.split_whitespace()
-        .map(|s| s.parse().unwrap())
+        .map(|s| s.parse().unwrap_or_default())
         .collect::<Vec<T>>()
 }
 
