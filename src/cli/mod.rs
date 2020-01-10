@@ -29,8 +29,17 @@ impl CliSubCommands {
     }
 }
 
+fn generate_new_config() -> Config {
+    match Config::new() {
+        Ok(config) => config,
+        _ => panic!("Save file path is missing from config"),
+    }
+}
+
 pub fn init() {
-    let config = Config::new();
+    let config = generate_new_config();
+    let save_file_path = &config.save_file_path().unwrap();
+
     let matches = App::new(crate_name!())
         .version(crate_version!())
         .author(crate_authors!())
@@ -82,10 +91,10 @@ pub fn init() {
         .get_matches();
 
     if let Some(_list_matches) = matches.subcommand_matches(CliSubCommands::List.get_string()) {
-        let authors = load(config.save_file_path()).expect("Failed to load existing data");
+        let authors = load(PathBuf::from(save_file_path)).expect("Failed to load existing data");
         handle_list_sub_command(authors);
     } else if let Some(add_matches) = matches.subcommand_matches(CliSubCommands::Add.get_string()) {
-        let authors = load(config.save_file_path()).expect("Failed to load existing data");
+        let authors = load(PathBuf::from(save_file_path)).expect("Failed to load existing data");
         let author = Author::with_active_state(
             add_matches
                 .value_of("name")
@@ -97,17 +106,17 @@ pub fn init() {
                 .to_string(),
             add_matches.is_present("active"),
         );
-        handle_add_sub_command(authors, author, config.save_file_path());
+        handle_add_sub_command(authors, author, save_file_path);
     } else if let Some(_message_matches) =
         matches.subcommand_matches(CliSubCommands::Message.get_string())
     {
-        let authors = load(config.save_file_path()).expect("Failed to load existing data");
+        let authors = load(PathBuf::from(save_file_path)).expect("Failed to load existing data");
         handle_message_sub_command(authors);
     } else if let Some(_configure_matches) =
         matches.subcommand_matches(CliSubCommands::Configure.get_string())
     {
-        let authors = load(config.save_file_path()).expect("failed");
-        handle_configure_sub_command(authors, config.save_file_path());
+        let authors = load(PathBuf::from(save_file_path)).expect("failed");
+        handle_configure_sub_command(authors, save_file_path);
     }
 }
 
@@ -116,21 +125,21 @@ fn handle_list_sub_command(author_col: AuthorCollection) {
     println!("{}", output);
 }
 
-fn handle_add_sub_command(mut authors: AuthorCollection, new_author: Author, file_path: PathBuf) {
+fn handle_add_sub_command(mut authors: AuthorCollection, new_author: Author, file_path: &PathBuf) {
     authors.add_author(new_author);
-    save(file_path, &authors);
+    save(PathBuf::from(file_path), &authors);
 }
 
 fn handle_message_sub_command(authors: AuthorCollection) {
     println!("{}", authors.join_all_active_coauthor_strings());
 }
 
-fn handle_configure_sub_command(mut authors: AuthorCollection, file_path: PathBuf) {
+fn handle_configure_sub_command(mut authors: AuthorCollection, file_path: &PathBuf) {
     let output: String = authors.authors_with_indexes();
     println!("{}", output);
     let indexes = get_user_input::<i32>(String::from(
         "Enter the indexes of the authors to be active",
     ));
     authors.set_active_authors_by_indexes(&indexes);
-    save(file_path, &authors);
+    save(PathBuf::from(file_path), &authors);
 }
