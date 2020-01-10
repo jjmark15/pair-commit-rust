@@ -9,7 +9,7 @@ SHA1=$3
 binary_path="$HOME/.local/bin/pair-commit-tool"
 
 if test ! -f "$binary_path"; then
-  echo >&2 "Error: pair-commit-tool binary not found"
+  echo "Error: pair-commit-tool binary not found"
   exit 1
 fi
 
