@@ -138,7 +138,7 @@ fn handle_configure_sub_command(mut authors: AuthorCollection, file_path: &PathB
     let output: String = authors.authors_with_indexes();
     println!("{}", output);
     let indexes = get_user_input::<i32>(String::from(
-        "Enter the indexes of the authors to be active",
+        "Enter the indexes of the authors to be active (comma separated)",
     ));
     authors.set_active_authors_by_indexes(&indexes);
     save(PathBuf::from(file_path), &authors);

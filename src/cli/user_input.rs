@@ -17,16 +17,16 @@ where
     if string.is_empty() {
         Vec::new()
     } else {
-        split_string_to_vec::<T>(string)
+        split_string_to_vec::<T>(string, ",".parse().unwrap())
     }
 }
 
-fn split_string_to_vec<T: FromStr + Default>(s: String) -> Vec<T>
+fn split_string_to_vec<T: FromStr + Default>(s: String, split_string: char) -> Vec<T>
 where
     <T as std::str::FromStr>::Err: std::fmt::Debug,
 {
-    s.split_whitespace()
-        .map(|s| s.parse().unwrap_or_default())
+    s.split(split_string)
+        .map(|s| s.trim().parse().unwrap_or_default())
         .collect::<Vec<T>>()
 }
 
@@ -48,9 +48,16 @@ mod tests {
     use crate::cli::user_input::*;
 
     #[test]
-    fn test_split_string_to_vec_i32() {
+    fn test_split_string_to_vec_i32_space() {
         let string = "1 2 3 4".to_string();
-        let vec = split_string_to_vec::<i32>(string);
+        let vec = split_string_to_vec::<i32>(string, " ".parse().unwrap());
+        assert_eq!(vec![1, 2, 3, 4], vec);
+    }
+
+    #[test]
+    fn test_split_string_to_vec_i32_comma() {
+        let string = "1, 2, 3, 4".to_string();
+        let vec = split_string_to_vec::<i32>(string, ",".parse().unwrap());
         assert_eq!(vec![1, 2, 3, 4], vec);
     }
 }
