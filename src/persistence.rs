@@ -1,4 +1,4 @@
-use std::fs::File;
+use std::fs::{create_dir, File};
 use std::io::{ErrorKind, Write};
 use std::path::PathBuf;
 
@@ -6,6 +6,11 @@ use pair_commit_tool::models::author::author_collection::AuthorCollection;
 use pair_commit_tool::models::author::Author;
 
 pub fn save(file_path: PathBuf, authors: &AuthorCollection) {
+    let parent: PathBuf = file_path.parent().unwrap().to_path_buf();
+    if !save_directory_exists(&parent) {
+        create_dir(parent).unwrap();
+    }
+
     let mut file = match File::create(file_path) {
         Ok(file) => file,
         Err(error) => match error.kind() {
@@ -21,6 +26,10 @@ pub fn save(file_path: PathBuf, authors: &AuthorCollection) {
         },
         Err(e) => panic!("Problem serializing authors to writer: {:?}", e),
     }
+}
+
+fn save_directory_exists(dir: &PathBuf) -> bool {
+    dir.is_dir()
 }
 
 pub fn load(file_path: PathBuf) -> Result<AuthorCollection, serde_yaml::Error> {
@@ -45,7 +54,7 @@ mod tests {
     use pair_commit_tool::models::author::author_collection::AuthorCollection;
     use pair_commit_tool::models::author::Author;
 
-    use crate::persistence::{load, save};
+    use crate::persistence::{load, save, save_directory_exists};
 
     enum PersistenceFilePath {
         Basic,
@@ -99,5 +108,27 @@ mod tests {
         assert_eq!(true, data.is_ok());
         let authors = data.unwrap();
         assert_eq!(false, authors.authors().is_empty())
+    }
+
+    #[test]
+    fn test_save_directory_exists_missing() {
+        let file_path: PathBuf = PersistenceFilePath::MissingParent.get_filepath();
+        let dir: PathBuf = file_path.parent().unwrap().into();
+        assert_eq!(
+            false,
+            save_directory_exists(&dir),
+            "showing that path does not exist"
+        );
+    }
+
+    #[test]
+    fn test_save_directory_exists_exists() {
+        let file_path: PathBuf = PersistenceFilePath::Writable.get_filepath();
+        let dir: PathBuf = file_path.parent().unwrap().into();
+        assert_eq!(
+            true,
+            save_directory_exists(&dir),
+            "showing that path exists"
+        );
     }
 }
