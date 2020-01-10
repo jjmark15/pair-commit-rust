@@ -85,16 +85,6 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
-    fn test_write_missing_parent() {
-        let path = PersistenceFilePath::MissingParent.get_filepath();
-        let mut authors = AuthorCollection::new();
-        let author = Author::default();
-        authors.add_author(author);
-        save(path, &authors);
-    }
-
-    #[test]
     fn test_load_missing() {
         let path = PersistenceFilePath::Missing.get_filepath();
         let data = load(path);
