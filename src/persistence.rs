@@ -5,7 +5,28 @@ use std::path::PathBuf;
 use pair_commit_tool::models::author::author_collection::AuthorCollection;
 use pair_commit_tool::models::author::Author;
 
-pub fn save(file_path: PathBuf, authors: &AuthorCollection) {
+pub trait PersistenceItem<'a, T: Serialize + Deserialize<'a>> {
+    fn persistence_representation(&self) -> &T;
+}
+
+pub trait Serialize: serde::Serialize {}
+
+impl Serialize for Vec<Author> {}
+
+pub trait Deserialize<'a>: serde::Deserialize<'a> {}
+
+impl Deserialize<'_> for Vec<Author> {}
+
+impl PersistenceItem<'_, Vec<Author>> for AuthorCollection {
+    fn persistence_representation(&self) -> &Vec<Author> {
+        &self.authors()
+    }
+}
+
+pub fn save<'a, S: Serialize + Deserialize<'a>, T: PersistenceItem<'a, S>>(
+    file_path: PathBuf,
+    authors: &T,
+) {
     let parent: PathBuf = file_path.parent().unwrap().to_path_buf();
     if !save_directory_exists(&parent) {
         create_dir(parent).unwrap();
@@ -19,7 +40,7 @@ pub fn save(file_path: PathBuf, authors: &AuthorCollection) {
         },
     };
 
-    match serde_yaml::to_writer(&file, authors.authors()) {
+    match serde_yaml::to_writer(&file, authors.persistence_representation()) {
         Ok(()) => match file.flush() {
             Ok(s) => s,
             Err(error) => panic!("Problem writing data to file: {:?}", error),
