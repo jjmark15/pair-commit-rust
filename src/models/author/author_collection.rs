@@ -97,13 +97,14 @@ impl AsRef<AuthorCollection> for AuthorCollection {
 #[cfg(test)]
 mod tests {
     use crate::models::author::author_collection::AuthorCollection;
+    use crate::models::author::ActiveState::ACTIVE;
     use crate::models::author::Author;
 
     #[test]
     fn test_join_all_active_coauthor_strings() {
         let authors = AuthorCollection::from(vec![
-            Author::with_active_state("Tester".to_string(), "tester@test.com".to_string(), true),
-            Author::with_active_state("Tester".to_string(), "tester@test.com".to_string(), true),
+            Author::with_active_state("Tester".to_string(), "tester@test.com".to_string(), ACTIVE),
+            Author::with_active_state("Tester".to_string(), "tester@test.com".to_string(), ACTIVE),
         ]);
         assert_eq!(
             "Co-authored-by: Tester <tester@test.com>\n\
@@ -116,12 +117,12 @@ mod tests {
     fn test_set_active_authors_by_indexes() {
         let mut authors = AuthorCollection::from(vec![
             Author::new("Tester".to_string(), "tester@test.com".to_string()),
-            Author::with_active_state("Tester".to_string(), "tester@test.com".to_string(), true),
+            Author::with_active_state("Tester".to_string(), "tester@test.com".to_string(), ACTIVE),
         ]);
 
         authors.set_active_authors_by_indexes(&[0 as i32]);
-        assert!(authors.authors().get(0).unwrap().active);
-        assert!(!authors.authors().get(1).unwrap().active);
+        assert!(authors.authors().get(0).unwrap().active());
+        assert!(!authors.authors().get(1).unwrap().active());
     }
 
     #[test]
@@ -138,7 +139,7 @@ mod tests {
         authors.add_author(Author::with_active_state(
             "Tester".to_string(),
             "tester@test.com".to_string(),
-            true,
+            ACTIVE,
         ));
         let active = authors.active_authors();
         assert_eq!(1, active.len());
@@ -154,7 +155,7 @@ mod tests {
     fn test_authors_with_indexes() {
         let authors = AuthorCollection::from(vec![
             Author::new("Tester".to_string(), "tester@test.com".to_string()),
-            Author::with_active_state("Tester".to_string(), "tester@test.com".to_string(), true),
+            Author::with_active_state("Tester".to_string(), "tester@test.com".to_string(), ACTIVE),
         ]);
         let s = authors.authors_with_indexes();
         let expected = "- index: 0\n  \

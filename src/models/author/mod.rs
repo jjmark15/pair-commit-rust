@@ -2,13 +2,15 @@ use std::fmt::{Display, Error, Formatter};
 
 use serde::{Deserialize, Serialize};
 
+use crate::models::author::ActiveState::{ACTIVE, INACTIVE};
+
 pub mod author_collection;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Author {
     name: String,
     email: String,
-    active: bool,
+    active: ActiveState,
 }
 
 impl Display for Author {
@@ -22,14 +24,14 @@ impl Default for Author {
         Author {
             name: String::from(""),
             email: String::from(""),
-            active: false,
+            active: INACTIVE,
         }
     }
 }
 
 impl Author {
     pub fn active(&self) -> bool {
-        self.active
+        self.active.into()
     }
 
     pub fn name(&self) -> &String {
@@ -48,7 +50,7 @@ impl Author {
         }
     }
 
-    pub fn with_active_state(name: String, email: String, active: bool) -> Author {
+    pub fn with_active_state(name: String, email: String, active: ActiveState) -> Author {
         Author {
             name,
             email,
@@ -57,15 +59,39 @@ impl Author {
     }
 
     pub fn activate(&mut self) {
-        self.active = true
+        self.active = ACTIVE
     }
 
     pub fn deactivate(&mut self) {
-        self.active = false;
+        self.active = INACTIVE;
     }
 
     pub fn coauthor_string(&self) -> String {
         return format!("Co-authored-by: {} <{}>", self.name, self.email);
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Copy, Clone)]
+pub enum ActiveState {
+    ACTIVE,
+    INACTIVE,
+}
+
+impl From<bool> for ActiveState {
+    fn from(b: bool) -> Self {
+        match b {
+            true => ACTIVE,
+            false => INACTIVE,
+        }
+    }
+}
+
+impl From<ActiveState> for bool {
+    fn from(state: ActiveState) -> Self {
+        match state {
+            ACTIVE => true,
+            INACTIVE => false,
+        }
     }
 }
 
@@ -83,7 +109,7 @@ mod tests {
         let author = Author::with_active_state(
             String::from("Tester"),
             String::from("tester@test.com"),
-            true,
+            ACTIVE,
         );
         assert_eq!(true, author.active())
     }
@@ -93,7 +119,7 @@ mod tests {
         let author = Author::with_active_state(
             String::from("Tester"),
             String::from("tester@test.com"),
-            false,
+            false.into(),
         );
         assert_eq!(false, author.active())
     }
@@ -128,7 +154,7 @@ mod tests {
     #[test]
     fn test_author_deactivate() {
         let mut author = Author {
-            active: true,
+            active: ACTIVE,
             ..Author::default()
         };
         author.deactivate();
@@ -173,7 +199,7 @@ mod tests {
         let expected: String = "---\n\
                                 - name: Tester\n  \
                                 email: tester@test.com\n  \
-                                active: false"
+                                active: INACTIVE"
             .to_string();
         assert_eq!(expected, s);
     }

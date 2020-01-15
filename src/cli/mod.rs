@@ -106,7 +106,7 @@ pub fn init() {
                 .value_of("email")
                 .expect("Email value not found")
                 .to_string(),
-            add_matches.is_present("active"),
+            add_matches.is_present("active").into(),
         );
         handle_add_sub_command(authors, author, save_file_path);
     } else if let Some(_message_matches) =
