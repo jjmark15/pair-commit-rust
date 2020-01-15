@@ -7,7 +7,7 @@ use pair_commit_tool::models::author::Author;
 
 use crate::cli::user_input::{get_list_command_string, get_user_input};
 use crate::config::Config;
-use crate::persistence::{load, save};
+use crate::persistence;
 
 mod user_input;
 
@@ -91,10 +91,12 @@ pub fn init() {
         .get_matches();
 
     if let Some(_list_matches) = matches.subcommand_matches(CliSubCommands::List.get_string()) {
-        let authors = load(PathBuf::from(save_file_path)).expect("Failed to load existing data");
+        let authors =
+            persistence::load(PathBuf::from(save_file_path)).expect("Failed to load existing data");
         handle_list_sub_command(authors);
     } else if let Some(add_matches) = matches.subcommand_matches(CliSubCommands::Add.get_string()) {
-        let authors = load(PathBuf::from(save_file_path)).expect("Failed to load existing data");
+        let authors =
+            persistence::load(PathBuf::from(save_file_path)).expect("Failed to load existing data");
         let author = Author::with_active_state(
             add_matches
                 .value_of("name")
@@ -110,12 +112,13 @@ pub fn init() {
     } else if let Some(_message_matches) =
         matches.subcommand_matches(CliSubCommands::Message.get_string())
     {
-        let authors = load(PathBuf::from(save_file_path)).expect("Failed to load existing data");
+        let authors =
+            persistence::load(PathBuf::from(save_file_path)).expect("Failed to load existing data");
         handle_message_sub_command(authors);
     } else if let Some(_configure_matches) =
         matches.subcommand_matches(CliSubCommands::Configure.get_string())
     {
-        let authors = load(PathBuf::from(save_file_path)).expect("failed");
+        let authors = persistence::load(PathBuf::from(save_file_path)).expect("failed");
         handle_configure_sub_command(authors, save_file_path);
     }
 }
@@ -127,7 +130,7 @@ fn handle_list_sub_command(author_col: AuthorCollection) {
 
 fn handle_add_sub_command(mut authors: AuthorCollection, new_author: Author, file_path: &PathBuf) {
     authors.add_author(new_author);
-    save(PathBuf::from(file_path), &authors);
+    persistence::save(PathBuf::from(file_path), &authors);
 }
 
 fn handle_message_sub_command(authors: AuthorCollection) {
@@ -141,5 +144,5 @@ fn handle_configure_sub_command(mut authors: AuthorCollection, file_path: &PathB
         "Enter the indexes of the authors to be active (comma separated)",
     ));
     authors.set_active_authors_by_indexes(&indexes);
-    save(PathBuf::from(file_path), &authors);
+    persistence::save(PathBuf::from(file_path), &authors);
 }
