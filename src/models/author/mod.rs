@@ -79,9 +79,10 @@ pub enum ActiveState {
 
 impl From<bool> for ActiveState {
     fn from(b: bool) -> Self {
-        match b {
-            true => ACTIVE,
-            false => INACTIVE,
+        if b {
+            ACTIVE
+        } else {
+            INACTIVE
         }
     }
 }

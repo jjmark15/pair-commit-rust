@@ -4,8 +4,10 @@ use std::str::FromStr;
 
 use pair_commit_tool::models::author::author_collection::AuthorCollection;
 
-pub fn get_list_command_string(author_col: &AuthorCollection) -> Result<String, serde_yaml::Error> {
-    serde_yaml::to_string(author_col.authors())
+pub fn get_list_command_string<T: AsRef<AuthorCollection>>(
+    author_col: T,
+) -> Result<String, serde_yaml::Error> {
+    serde_yaml::to_string(author_col.as_ref().authors())
 }
 
 pub fn get_user_input<P: AsRef<str>, T: FromStr + Default>(prompt: P) -> Vec<T>
