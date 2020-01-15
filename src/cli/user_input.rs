@@ -8,24 +8,25 @@ pub fn get_list_command_string(author_col: &AuthorCollection) -> Result<String, 
     serde_yaml::to_string(author_col.authors())
 }
 
-pub fn get_user_input<T: FromStr + Default>(prompt: String) -> Vec<T>
+pub fn get_user_input<P: AsRef<str>, T: FromStr + Default>(prompt: P) -> Vec<T>
 where
     <T as std::str::FromStr>::Err: std::fmt::Debug,
 {
-    print!("{}: ", prompt);
+    print!("{}: ", prompt.as_ref());
     let string: String = read_input_line();
     if string.is_empty() {
         Vec::new()
     } else {
-        split_string_to_vec::<T>(string, ",".parse().unwrap())
+        split_string_to_vec(string, ",".parse().unwrap())
     }
 }
 
-fn split_string_to_vec<T: FromStr + Default>(s: String, split_string: char) -> Vec<T>
+fn split_string_to_vec<P: AsRef<str>, T: FromStr + Default>(s: P, split_string: char) -> Vec<T>
 where
     <T as std::str::FromStr>::Err: std::fmt::Debug,
 {
-    s.split(split_string)
+    s.as_ref()
+        .split(split_string)
         .map(|s| s.trim().parse().unwrap_or_default())
         .collect::<Vec<T>>()
 }
@@ -50,14 +51,14 @@ mod tests {
     #[test]
     fn test_split_string_to_vec_i32_space() {
         let string = "1 2 3 4".to_string();
-        let vec = split_string_to_vec::<i32>(string, " ".parse().unwrap());
+        let vec: Vec<i32> = split_string_to_vec(string, " ".parse().unwrap());
         assert_eq!(vec![1, 2, 3, 4], vec);
     }
 
     #[test]
     fn test_split_string_to_vec_i32_comma() {
-        let string = "1, 2, 3, 4".to_string();
-        let vec = split_string_to_vec::<i32>(string, ",".parse().unwrap());
+        let string = "1, 2, 3, 4";
+        let vec: Vec<i32> = split_string_to_vec(string, ",".parse().unwrap());
         assert_eq!(vec![1, 2, 3, 4], vec);
     }
 }

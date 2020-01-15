@@ -88,6 +88,12 @@ impl Into<Vec<Author>> for AuthorCollection {
     }
 }
 
+impl AsRef<AuthorCollection> for AuthorCollection {
+    fn as_ref(&self) -> &AuthorCollection {
+        self
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::models::author::author_collection::AuthorCollection;

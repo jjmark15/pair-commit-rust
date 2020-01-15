@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use pair_commit_tool::models::author::author_collection::AuthorCollection;
 use pair_commit_tool::models::author::Author;
 
-pub fn save(file_path: PathBuf, authors: &AuthorCollection) {
+pub fn save<T: AsRef<AuthorCollection>>(file_path: PathBuf, authors: T) {
     let parent: PathBuf = file_path.parent().unwrap().to_path_buf();
     if !save_directory_exists(&parent) {
         create_dir(parent).unwrap();
@@ -19,7 +19,7 @@ pub fn save(file_path: PathBuf, authors: &AuthorCollection) {
         },
     };
 
-    match serde_yaml::to_writer(&file, authors.authors()) {
+    match serde_yaml::to_writer(&file, authors.as_ref().authors()) {
         Ok(()) => match file.flush() {
             Ok(s) => s,
             Err(error) => panic!("Problem writing data to file: {:?}", error),
