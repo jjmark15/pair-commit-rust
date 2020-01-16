@@ -5,7 +5,7 @@ use clap::{App, Arg, SubCommand};
 use pair_commit_tool::models::author::author_collection::AuthorCollection;
 use pair_commit_tool::models::author::Author;
 
-use crate::cli::user_input::{get_list_command_string, get_user_input};
+use crate::cli::user_input::get_user_input;
 use crate::config::Config;
 use crate::persistence;
 
@@ -124,8 +124,7 @@ pub fn init() {
 }
 
 fn handle_list_sub_command(author_col: AuthorCollection) {
-    let output: String = get_list_command_string(&author_col).unwrap_or_else(|_| "".to_string());
-    println!("{}", output);
+    println!("{}", author_col.authors_with_indexes());
 }
 
 fn handle_add_sub_command(mut authors: AuthorCollection, new_author: Author, file_path: &PathBuf) {
