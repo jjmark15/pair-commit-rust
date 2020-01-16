@@ -62,7 +62,7 @@ impl AuthorCollection {
                     index,
                     author.name(),
                     author.email(),
-                    author.active()
+                    author.active::<bool>()
                 )
             })
             .collect::<Vec<String>>()
@@ -121,8 +121,8 @@ mod tests {
         ]);
 
         authors.set_active_authors_by_indexes(&[0 as i32]);
-        assert!(authors.authors().get(0).unwrap().active());
-        assert!(!authors.authors().get(1).unwrap().active());
+        assert!(authors.authors().get(0).unwrap().active::<bool>());
+        assert!(!authors.authors().get(1).unwrap().active::<bool>());
     }
 
     #[test]

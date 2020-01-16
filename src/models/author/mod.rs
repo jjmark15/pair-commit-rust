@@ -6,6 +6,13 @@ use crate::models::author::ActiveState::{ACTIVE, INACTIVE};
 
 pub mod author_collection;
 
+/// Stores data of a commit author
+/// # Examples
+/// ```
+/// # use pair_commit_tool::models::author::Author;
+/// # use pair_commit_tool::models::author::ActiveState::ACTIVE;
+/// let author = Author::with_active_state("Tester", "tester@test.com", ACTIVE);
+/// ```
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Author {
     name: String,
@@ -30,7 +37,17 @@ impl Default for Author {
 }
 
 impl Author {
-    pub fn active(&self) -> bool {
+    /// # Examples
+    /// ```
+    /// # use pair_commit_tool::models::author::Author;
+    /// # use pair_commit_tool::models::author::ActiveState::ACTIVE;
+    /// # let mut author = Author::default();
+    /// # assert_ne!(ACTIVE, author.active());
+    /// author.activate();
+    /// assert_eq!(ACTIVE, author.active());
+    /// assert_eq!(true, author.active());
+    /// ```
+    pub fn active<T: From<ActiveState>>(&self) -> T {
         self.active.into()
     }
 
@@ -42,36 +59,70 @@ impl Author {
         &self.email
     }
 
-    pub fn new(name: String, email: String) -> Author {
+    pub fn new<S: AsRef<str>, T: AsRef<str>>(name: S, email: T) -> Author {
         Author {
-            name,
-            email,
+            name: name.as_ref().to_string(),
+            email: email.as_ref().to_string(),
             ..Author::default()
         }
     }
 
-    pub fn with_active_state(name: String, email: String, active: ActiveState) -> Author {
+    /// # Examples
+    /// Active example:
+    /// ```
+    /// # use pair_commit_tool::models::author::Author;
+    /// # use pair_commit_tool::models::author::ActiveState::ACTIVE;
+    /// let author = Author::with_active_state("Tester", "tester@test.com", ACTIVE);
+    /// assert_eq!(true, author.active());
+    /// ```
+    /// Inactive example:
+    /// ```
+    /// # use pair_commit_tool::models::author::Author;
+    /// # use pair_commit_tool::models::author::ActiveState::{INACTIVE};
+    /// let author = Author::with_active_state("Tester", "tester@test.com", INACTIVE);
+    /// assert_eq!(false, author.active());
+    /// ```
+    pub fn with_active_state<S: AsRef<str>, T: AsRef<str>>(
+        name: S,
+        email: T,
+        active: ActiveState,
+    ) -> Author {
         Author {
-            name,
-            email,
+            name: name.as_ref().to_string(),
+            email: email.as_ref().to_string(),
             active,
         }
     }
 
+    /// Activate author
     pub fn activate(&mut self) {
         self.active = ACTIVE
     }
 
+    /// Deactivate author
     pub fn deactivate(&mut self) {
         self.active = INACTIVE;
     }
 
+    /// # Examples
+    /// ```
+    /// # use pair_commit_tool::models::author::Author;
+    /// let author = Author::new("Tester", "tester@test.com");
+    /// assert_eq!("Co-authored-by: Tester <tester@test.com>", author.coauthor_string());
+    /// ```
     pub fn coauthor_string(&self) -> String {
         return format!("Co-authored-by: {} <{}>", self.name, self.email);
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Copy, Clone)]
+/// Represents the active state of an author
+/// # Examples
+/// ```
+/// # use pair_commit_tool::models::author::ActiveState::{ACTIVE, INACTIVE};
+/// assert_eq!(true, ACTIVE.into());
+/// assert_eq!(false, INACTIVE.into());
+/// ```
+#[derive(Debug, Serialize, Deserialize, Copy, Clone, Eq, PartialEq)]
 pub enum ActiveState {
     ACTIVE,
     INACTIVE,
@@ -106,26 +157,6 @@ mod tests {
     }
 
     #[test]
-    fn test_with_active_state_true() {
-        let author = Author::with_active_state(
-            String::from("Tester"),
-            String::from("tester@test.com"),
-            ACTIVE,
-        );
-        assert_eq!(true, author.active())
-    }
-
-    #[test]
-    fn test_with_active_state_false() {
-        let author = Author::with_active_state(
-            String::from("Tester"),
-            String::from("tester@test.com"),
-            false.into(),
-        );
-        assert_eq!(false, author.active())
-    }
-
-    #[test]
     fn test_author_active_false_default() {
         let author = Author::default();
         assert_eq!(false, author.active())
@@ -134,14 +165,14 @@ mod tests {
     #[test]
     fn test_name() {
         let name = "Tester".to_string();
-        let author = Author::new(name.clone(), "".to_string());
+        let author = Author::new(name.clone(), "");
         assert_eq!(&name, author.name());
     }
 
     #[test]
     fn test_email() {
         let email = "tester@test.com".to_string();
-        let author = Author::new(email.clone(), "".to_string());
+        let author = Author::new(email.clone(), "");
         assert_eq!(&email, author.name());
     }
 
@@ -163,19 +194,8 @@ mod tests {
     }
 
     #[test]
-    fn test_author_coauthor_message() {
-        let name = String::from("Tester");
-        let email = String::from("tester@test.com");
-        let author: Author = Author::new(name, email);
-        assert_eq!(
-            "Co-authored-by: Tester <tester@test.com>",
-            author.coauthor_string()
-        );
-    }
-
-    #[test]
     fn test_author_display() {
-        let author = Author::new("Tester".to_string(), "tester@test.com".to_string());
+        let author = Author::new("Tester", "tester@test.com");
 
         assert_eq!("Tester <tester@test.com>", author.to_string());
     }
@@ -191,7 +211,7 @@ mod tests {
     #[test]
     fn test_serialize_authors() {
         let mut authors = Vec::new();
-        let author = Author::new("Tester".to_string(), "tester@test.com".to_string());
+        let author = Author::new("Tester", "tester@test.com");
         authors.push(author);
 
         let r = serde_yaml::to_string(&authors);
