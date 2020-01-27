@@ -1,9 +1,19 @@
 use std::fs::{create_dir, File};
 use std::io::{ErrorKind, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use pair_commit_tool::models::author::author_collection::AuthorCollection;
 use pair_commit_tool::models::author::Author;
+
+trait PersistenceItem {
+    fn is_dir(&self) -> bool;
+}
+
+impl PersistenceItem for std::path::PathBuf {
+    fn is_dir(&self) -> bool {
+        Path::is_dir(self)
+    }
+}
 
 pub fn save<T: AsRef<AuthorCollection>>(file_path: PathBuf, authors: T) {
     let parent: PathBuf = file_path.parent().unwrap().to_path_buf();
@@ -28,7 +38,7 @@ pub fn save<T: AsRef<AuthorCollection>>(file_path: PathBuf, authors: T) {
     }
 }
 
-fn save_directory_exists(dir: &PathBuf) -> bool {
+fn save_directory_exists<T: PersistenceItem>(dir: &T) -> bool {
     dir.is_dir()
 }
 
@@ -51,10 +61,20 @@ pub fn load(file_path: PathBuf) -> Result<AuthorCollection, serde_yaml::Error> {
 mod tests {
     use std::path::PathBuf;
 
+    use mockall::predicate::*;
+    use mockall::*;
+
     use pair_commit_tool::models::author::author_collection::AuthorCollection;
     use pair_commit_tool::models::author::Author;
 
-    use crate::persistence::{load, save, save_directory_exists};
+    use crate::persistence::{load, save, save_directory_exists, PersistenceItem};
+
+    mock! {
+        Path {}
+        trait PersistenceItem {
+            fn is_dir(&self) -> bool;
+        }
+    }
 
     enum PersistenceFilePath {
         Basic,
@@ -120,5 +140,19 @@ mod tests {
             save_directory_exists(&dir),
             "showing that path exists"
         );
+    }
+
+    #[test]
+    fn test_save_directory_exists_true_mocked() {
+        let mut mock_path = MockPath::new();
+        mock_path.expect_is_dir().returning(|| true);
+        assert_eq!(save_directory_exists(&mock_path), true);
+    }
+
+    #[test]
+    fn test_save_directory_exists_false_mocked() {
+        let mut mock_path = MockPath::new();
+        mock_path.expect_is_dir().returning(|| false);
+        assert_eq!(save_directory_exists(&mock_path), false);
     }
 }
